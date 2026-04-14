@@ -3,9 +3,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import pearsonr
 
 
-# =========================
-# 1) DATA YÜKLE
-# =========================
+
 df = pd.read_csv("final_cleaned_dataset.csv")
 
 print("\n=========================")
@@ -17,9 +15,7 @@ print("\nColumns:")
 print(df.columns.tolist())
 
 
-# =========================
-# 2) GENEL BİLGİ
-# =========================
+
 print("\n=========================")
 print("DATA OVERVIEW")
 print("=========================")
@@ -32,9 +28,7 @@ print("\nDescriptive statistics:")
 print(df.describe())
 
 
-# =========================
-# 3) SONUÇ DAĞILIMI
-# =========================
+
 print("\n=========================")
 print("MATCH RESULT DISTRIBUTION")
 print("=========================")
@@ -47,9 +41,6 @@ overall_home_win = df["home_win"].mean()
 print("\nOverall home win rate:", overall_home_win)
 
 
-# =========================
-# 4) ŞEHİR BAZLI ANALİZ
-# =========================
 print("\n=========================")
 print("CITY-LEVEL HOME WIN RATE")
 print("=========================")
@@ -63,9 +54,7 @@ city_home_goals = df.groupby("city")["fulltimehomegoals"].mean().sort_values(asc
 print(city_home_goals)
 
 
-# =========================
-# 5) WEALTH ANALYSIS
-# =========================
+
 print("\n=========================")
 print("WEALTH VARIABLES")
 print("=========================")
@@ -89,9 +78,7 @@ corr_matrix = df[
 print(corr_matrix)
 
 
-# =========================
-# 6) HYPOTHESIS TESTS
-# =========================
+
 print("\n=========================")
 print("HYPOTHESIS TEST 1")
 print("real_wealth vs home_win")
@@ -119,9 +106,7 @@ else:
     print("Result: Not statistically significant.")
 
 
-# =========================
-# 7) CITY SUMMARY TABLE
-# =========================
+
 print("\n=========================")
 print("CITY SUMMARY")
 print("=========================")
@@ -137,9 +122,7 @@ city_summary = df.groupby("city").agg(
 print(city_summary)
 
 
-# =========================
-# 8) GRAFİKLER
-# =========================
+
 plt.figure(figsize=(8, 5))
 plt.scatter(df["real_wealth"], df["home_win"])
 plt.xlabel("Real Wealth")
@@ -168,9 +151,6 @@ plt.savefig("plot_real_wealth_distribution.png")
 plt.show()
 
 
-# =========================
-# 9) OPTIONAL: CSV OUTPUT
-# =========================
 city_summary.to_csv("city_summary.csv")
 
 print("\n=========================")
