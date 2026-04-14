@@ -1,176 +1,182 @@
 import pandas as pd
+import matplotlib.pyplot as plt
+from scipy.stats import pearsonr
 
-
-epl = pd.read_csv("epl_final.csv")
-uk = pd.read_csv("uk_col_salary_longitudinal_2010_2024.csv")
-
-epl.columns = epl.columns.str.lower().str.strip().str.replace(" ", "_")
-uk.columns = uk.columns.str.lower().str.strip().str.replace(" ", "_")
-
-print("EPL kolonları:")
-print(epl.columns.tolist())
-print()
-
-print("UK kolonları:")
-print(uk.columns.tolist())
-print()
-
-
-epl["season"] = epl["season"].astype(str).str.strip()
-epl["season_start"] = epl["season"].str[:4].astype(int)
-
-
-epl = epl[(epl["season_start"] >= 2010) & (epl["season_start"] <= 2024)]
-
-
-epl["year"] = epl["season_start"]
-
-
-epl["hometeam"] = epl["hometeam"].astype(str).str.lower().str.strip()
-
-
-team_to_city = {
-    "arsenal": "london",
-    "chelsea": "london",
-    "tottenham": "london",
-    "tottenham hotspur": "london",
-    "west ham": "london",
-    "west ham united": "london",
-    "crystal palace": "london",
-    "brentford": "london",
-    "fulham": "london",
-    "queens park rangers": "london",
-    "qpr": "london",
-
-    "manchester united": "manchester",
-    "manchester city": "manchester",
-
-    "liverpool": "liverpool",
-    "everton": "liverpool",
-
-    "newcastle": "newcastle",
-    "newcastle united": "newcastle",
-
-    "aston villa": "birmingham",
-    "birmingham city": "birmingham",
-
-    "wolverhampton wanderers": "wolverhampton",
-    "wolves": "wolverhampton",
-
-    "leeds": "leeds",
-    "leeds united": "leeds",
-
-    "brighton": "brighton",
-    "brighton & hove albion": "brighton",
-
-    "southampton": "southampton",
-    "leicester city": "leicester",
-    "nottingham forest": "nottingham",
-    "ipswich town": "ipswich",
-    "bournemouth": "bournemouth",
-    "afc bournemouth": "bournemouth",
-    "burnley": "burnley",
-    "stoke city": "stoke-on-trent",
-    "sunderland": "sunderland",
-    "blackburn rovers": "blackburn",
-    "bolton wanderers": "bolton",
-    "wigan athletic": "wigan",
-    "portsmouth": "portsmouth",
-    "hull city": "hull",
-    "blackpool": "blackpool",
-    "swansea city": "swansea",
-    "cardiff city": "cardiff",
-    "middlesbrough": "middlesbrough",
-    "norwich city": "norwich",
-    "watford": "watford",
-    "reading": "reading",
-    "west brom": "west_bromwich",
-    "west bromwich albion": "west_bromwich",
-    "sheffield united": "sheffield",
-    "huddersfield town": "huddersfield",
-    "luton town": "luton"
-}
-
-epl["city"] = epl["hometeam"].map(team_to_city)
-
-
-epl = epl.dropna(subset=["city"])
-
-
-epl = epl[
-    [
-        "season",
-        "year",
-        "city",
-        "fulltimehomegoals",
-        "fulltimeawaygoals",
-        "fulltimeresult"
-    ]
-]
-
-
-epl["home_win"] = (epl["fulltimeresult"] == "H").astype(int)
-
-epl = epl.drop_duplicates()
-
-print("Filtre sonrası EPL shape:", epl.shape)
-print("Kalan sezonlar:")
-print(sorted(epl["season"].unique())[:3], "...")
-print(sorted(epl["season"].unique())[-3:])
-print()
 
 # =========================
-# 4) UK DATA TEMİZLE
+# 1) DATA YÜKLE
 # =========================
-salary_col = "median_salary_gross_gbp_monthly"
-cost_col = "cost_of_living_index"
-city_col = "city"
-year_col = "year"
+df = pd.read_csv("final_cleaned_dataset.csv")
 
-uk[salary_col] = pd.to_numeric(uk[salary_col], errors="coerce")
-uk[cost_col] = pd.to_numeric(uk[cost_col], errors="coerce")
-uk[year_col] = pd.to_numeric(uk[year_col], errors="coerce")
+print("\n=========================")
+print("DATA LOADED")
+print("=========================")
+print(df.head())
+print("\nShape:", df.shape)
+print("\nColumns:")
+print(df.columns.tolist())
 
-uk[city_col] = uk[city_col].astype(str).str.lower().str.strip()
+
+# =========================
+# 2) GENEL BİLGİ
+# =========================
+print("\n=========================")
+print("DATA OVERVIEW")
+print("=========================")
+print(df.info())
+
+print("\nMissing values:")
+print(df.isnull().sum())
+
+print("\nDescriptive statistics:")
+print(df.describe())
 
 
-uk = uk[
+# =========================
+# 3) SONUÇ DAĞILIMI
+# =========================
+print("\n=========================")
+print("MATCH RESULT DISTRIBUTION")
+print("=========================")
+print(df["fulltimeresult"].value_counts())
+
+print("\nHome win distribution:")
+print(df["home_win"].value_counts())
+
+overall_home_win = df["home_win"].mean()
+print("\nOverall home win rate:", overall_home_win)
+
+
+# =========================
+# 4) ŞEHİR BAZLI ANALİZ
+# =========================
+print("\n=========================")
+print("CITY-LEVEL HOME WIN RATE")
+print("=========================")
+city_home_win = df.groupby("city")["home_win"].mean().sort_values(ascending=False)
+print(city_home_win)
+
+print("\n=========================")
+print("CITY-LEVEL HOME GOALS")
+print("=========================")
+city_home_goals = df.groupby("city")["fulltimehomegoals"].mean().sort_values(ascending=False)
+print(city_home_goals)
+
+
+# =========================
+# 5) WEALTH ANALYSIS
+# =========================
+print("\n=========================")
+print("WEALTH VARIABLES")
+print("=========================")
+wealth_cols = ["real_wealth", "affordability_ratio", "rent_to_income_pct"]
+print(df[wealth_cols].describe())
+
+print("\n=========================")
+print("CORRELATION MATRIX")
+print("=========================")
+corr_matrix = df[
     [
-        year_col,
-        city_col,
-        salary_col,
-        cost_col,
+        "real_wealth",
         "affordability_ratio",
         "rent_to_income_pct",
-        "region",
-        "population_approx"
+        "fulltimehomegoals",
+        "fulltimeawaygoals",
+        "home_win"
     ]
-]
+].corr()
+
+print(corr_matrix)
 
 
-uk = uk.dropna(subset=[year_col, city_col, salary_col, cost_col])
+# =========================
+# 6) HYPOTHESIS TESTS
+# =========================
+print("\n=========================")
+print("HYPOTHESIS TEST 1")
+print("real_wealth vs home_win")
+print("=========================")
+corr1, p1 = pearsonr(df["real_wealth"], df["home_win"])
+print("Correlation:", corr1)
+print("P-value:", p1)
+
+if p1 < 0.05:
+    print("Result: Statistically significant relationship.")
+else:
+    print("Result: Not statistically significant.")
+
+print("\n=========================")
+print("HYPOTHESIS TEST 2")
+print("real_wealth vs fulltimehomegoals")
+print("=========================")
+corr2, p2 = pearsonr(df["real_wealth"], df["fulltimehomegoals"])
+print("Correlation:", corr2)
+print("P-value:", p2)
+
+if p2 < 0.05:
+    print("Result: Statistically significant relationship.")
+else:
+    print("Result: Not statistically significant.")
 
 
-uk = uk.drop_duplicates()
+# =========================
+# 7) CITY SUMMARY TABLE
+# =========================
+print("\n=========================")
+print("CITY SUMMARY")
+print("=========================")
+city_summary = df.groupby("city").agg(
+    matches=("home_win", "count"),
+    avg_home_win=("home_win", "mean"),
+    avg_home_goals=("fulltimehomegoals", "mean"),
+    avg_real_wealth=("real_wealth", "mean"),
+    avg_affordability=("affordability_ratio", "mean"),
+    avg_rent_to_income=("rent_to_income_pct", "mean")
+).sort_values(by="avg_home_win", ascending=False)
+
+print(city_summary)
 
 
-uk["real_wealth"] = uk[salary_col] / uk[cost_col]
+# =========================
+# 8) GRAFİKLER
+# =========================
+plt.figure(figsize=(8, 5))
+plt.scatter(df["real_wealth"], df["home_win"])
+plt.xlabel("Real Wealth")
+plt.ylabel("Home Win")
+plt.title("Real Wealth vs Home Win")
+plt.tight_layout()
+plt.savefig("plot_real_wealth_vs_home_win.png")
+plt.show()
 
-print("Temizlenmiş UK shape:", uk.shape)
-print()
+plt.figure(figsize=(8, 5))
+plt.scatter(df["real_wealth"], df["fulltimehomegoals"])
+plt.xlabel("Real Wealth")
+plt.ylabel("Full Time Home Goals")
+plt.title("Real Wealth vs Full Time Home Goals")
+plt.tight_layout()
+plt.savefig("plot_real_wealth_vs_home_goals.png")
+plt.show()
+
+plt.figure(figsize=(8, 5))
+plt.hist(df["real_wealth"], bins=20)
+plt.xlabel("Real Wealth")
+plt.ylabel("Frequency")
+plt.title("Distribution of Real Wealth")
+plt.tight_layout()
+plt.savefig("plot_real_wealth_distribution.png")
+plt.show()
 
 
-df = pd.merge(epl, uk, on=["city", "year"], how="inner")
+# =========================
+# 9) OPTIONAL: CSV OUTPUT
+# =========================
+city_summary.to_csv("city_summary.csv")
 
-
-df = df.dropna()
-df = df.drop_duplicates()
-
-print("Final shape:", df.shape)
-print(df.head())
-print()
-
-
-df.to_csv("final_cleaned_dataset.csv", index=False)
-
-print("final_cleaned_dataset.csv kaydedildi.")
+print("\n=========================")
+print("FILES CREATED")
+print("=========================")
+print("1) plot_real_wealth_vs_home_win.png")
+print("2) plot_real_wealth_vs_home_goals.png")
+print("3) plot_real_wealth_distribution.png")
+print("4) city_summary.csv")
