@@ -32,8 +32,9 @@ The project includes:
 - Data cleaning and merging
 - Feature engineering
 - Exploratory Data Analysis (EDA)
-- Correlation analysis
-- Hypothesis testing using Pearson correlation
+- Point-biserial correlation analysis for examining relationships between binary outcomes and continuous variables
+- Machine learning models (Logistic Regression and Random Forest) for predicting match results
+- Statistical evaluation and interpretation of findings
 
 ## Results
 
