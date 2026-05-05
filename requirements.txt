@@ -1,6 +1,14 @@
+<<<<<<< HEAD
 pandas
 numpy
 matplotlib
 scipy
 scikit-learn
+=======
+pandas
+numpy
+matplotlib
+scipy
+scikit-learn
+>>>>>>> 8a236c0 (Update notebook with point-biserial correlation and ML models)
 jupyter
