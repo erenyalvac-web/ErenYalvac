@@ -1,59 +1,89 @@
-# ErenYalvac
-DSA210 Data Science Project – Data analysis, hypothesis testing, and machine learning
 # EPL City Wealth Analysis
 
-This project analyzes the relationship between city wealth and home team performance in the English Premier League.
+## Overview
+This project analyzes whether socioeconomic conditions of cities (such as income, cost of living, and affordability) have any relationship with football match outcomes in the English Premier League (EPL).
+
+The main research question is:
+
+> Do wealth-related variables influence the probability of a home team winning?
+
+---
 
 ## Dataset
+The dataset combines:
 
-The dataset used in this project combines:
-- Premier League match data
-- UK city-level economic indicators (salary and cost of living)
+- EPL match data (2010–2025 seasons)
+- UK city-level socioeconomic data
 
-The football data includes **performance data from the 2010/2011 season to the 2024/2025 season**.
+Key variables include:
 
-A cleaned and feature-engineered dataset is provided as:
-- `final_cleaned_dataset.csv`
+- `home_win` (binary target variable: 1 = home team wins, 0 = otherwise)
+- `real_wealth`
+- `affordability_ratio`
+- `rent_to_income_pct`
+- `fulltimehomegoals`, `fulltimeawaygoals`
 
-## Features
+---
 
-A key variable created in this project is:
+## Methodology
 
-- `real_wealth` = median_salary_gross_gbp_monthly / cost_of_living_index
+### 1. Data Processing
+- Data cleaning and merging from multiple sources
+- Feature engineering (creation of real_wealth and ratios)
+- Handling missing values
 
-Other important variables include:
-- `home_win` (1 if home team wins, 0 otherwise)
-- `fulltimehomegoals`
-- `fulltimeawaygoals`
+### 2. Exploratory Data Analysis (EDA)
+- Distribution of match outcomes
+- City-level performance comparison
+- Visualization of wealth variables
+- Seasonal trends in home win rates
 
-## Methods
+### 3. Statistical Analysis
+- **Point-biserial correlation** is used to analyze the relationship between:
+  - Binary variable (`home_win`)
+  - Continuous socioeconomic variables
 
-The project includes:
-- Data cleaning and merging
-- Feature engineering
-- Exploratory Data Analysis (EDA)
-- Point-biserial correlation analysis for examining relationships between binary outcomes and continuous variables
-- Machine learning models (Logistic Regression and Random Forest) for predicting match results
-- Statistical evaluation and interpretation of findings
+This method is chosen because Pearson correlation is not appropriate for binary dependent variables.
 
-## Results
+### 4. Machine Learning Models
+The following models are applied:
 
-The analysis explores whether wealthier cities tend to have:
-- Higher home win rates
-- Higher goal-scoring performance
+- **Logistic Regression**
+- **Random Forest Classifier**
 
-Results include:
-- Scatter plots
-- Distribution plots
-- City-level summaries
+Purpose:
+- Predict whether the home team wins
+- Evaluate predictive power of socioeconomic variables
 
-## Files
+Evaluation metrics:
+- Accuracy
+- Confusion Matrix
+- Classification Report
 
-- `analysis.py` → Main analysis code
-- `final_cleaned_dataset.csv` → Cleaned dataset
-- `city_summary.csv` → Aggregated city-level results
-- `plot_*.png` → Visualizations
+---
 
-## Notes
+## Key Findings
 
-The dataset has been filtered to include only matches between **2010 and 2025 seasons**, ensuring consistency with the available economic data.
+- Socioeconomic variables show **weak correlation** with match outcomes
+- Point-biserial tests indicate **no strong statistical significance**
+- Machine learning models achieve **limited predictive accuracy**
+
+### Conclusion
+Football match outcomes are **not strongly driven by city-level wealth**.
+
+Other factors such as:
+- Team quality
+- Player performance
+- Tactics
+- Injuries
+
+are likely much more important.
+
+---
+
+## How to Run
+
+1. Install dependencies:
+
+```bash
+pip install -r requirements.txt
